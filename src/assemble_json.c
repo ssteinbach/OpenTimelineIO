@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 //#include "forge.h"
 
@@ -128,7 +129,7 @@ uint assemble_json_parse_value(AJsonValue *value, char *string, uint8 **memory)
 		{	
 			if(string[pos] > ' ' && string[pos] != ',')
 			{		
-				*memory += (uint)(*memory + sizeof(AJsonValue) - 1) % sizeof(AJsonValue); /* Alignment magic */
+				*memory += (uintptr_t)(*memory + sizeof(AJsonValue) - 1) % sizeof(AJsonValue); /* Alignment magic */
 				if(value != NULL)
 				{
 					if(v != NULL)

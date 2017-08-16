@@ -31,27 +31,27 @@ typedef struct{
 	OTIOList children;
 	OTIOList markers;
 	OTIOList effects;
-	OTIOTime start_time;
-	OTIOTime duration_time;
+	OTIO_RationalTime start_time;
+	OTIO_RationalTime duration_time;
 }OTIOComposable;
 
 typedef struct{
 	OTIOHeader header;
 	char *kind;
 	char *uri;
-	OTIOTime available_range;
+	OTIO_RationalTime available_range;
 }OTIOMediaReferences;
 
 typedef struct{
 	OTIOComposable header;
 	char *transition_type;
-	OTIOTime in_time;
-	OTIOTime out_time;
+	OTIO_RationalTime in_time;
+	OTIO_RationalTime out_time;
 }OTIOTransition;
 
 typedef struct{
 	OTIOHeader header;
-	OTIOTime time;
+	OTIO_RationalTime time;
 	char *message;
 }OTIOMarker;
 

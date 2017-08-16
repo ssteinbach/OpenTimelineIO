@@ -53,7 +53,7 @@ void otio_save_list(FILE *f, OTIOObject *child, char *tabs, uint indentation, ch
 	}
 }
 
-void otio_save_time(FILE *f, char *tabs, char *name, OTIOTime time)
+void otio_save_time(FILE *f, char *tabs, char *name, OTIO_RationalTime time)
 {
 	fprintf(f, ",\n%s\"%s\": {", tabs, name);
 	fprintf(f, "\n%s\t\"OTIO_SCHEMA\" : \"RationalTime.1\",", tabs);
@@ -192,7 +192,7 @@ uint otio_io_object_shema_get(AJsonObject *root, uint *version)
 	return -1;
 }
 
-uint otio_io_rational_time_get(AJsonObject *root, char *name, OTIOTime *time)
+uint otio_io_rational_time_get(AJsonObject *root, char *name, OTIO_RationalTime *time)
 {
 	AJsonObject	*member;
 	AJsonValue	*value;
@@ -216,7 +216,7 @@ uint otio_io_rational_time_get(AJsonObject *root, char *name, OTIOTime *time)
     return TRUE;
 }
 
-uint otio_io_range_time_get(AJsonObject *root, char *name, OTIOTime *duration, OTIOTime *start_time)
+uint otio_io_range_time_get(AJsonObject *root, char *name, OTIO_RationalTime *duration, OTIO_RationalTime *start_time)
 {
 	AJsonObject	*member;
 	AJsonValue	*value;
@@ -256,7 +256,7 @@ OTIOObject *otio_io_object_load(AJsonObject *root, uint expected)
 {
 	OTIOObject *object;
 	AJsonValue	*value;
-	OTIOTime time;
+	OTIO_RationalTime time;
 	uint type, version;
 	char *name = "unnamed";
 	type = otio_io_object_shema_get(root, &version);
@@ -317,7 +317,7 @@ OTIOObject *otio_io_object_load(AJsonObject *root, uint expected)
 	}
 	if(type < ORIO_OT_COMPOSABLE_END)
 	{
-		OTIOTime duration, start_time;
+		OTIO_RationalTime duration, start_time;
 		if(otio_io_range_time_get(root, "source_range", &duration, &start_time))
 		{
 			otio_composable_start_time_set(object, start_time);

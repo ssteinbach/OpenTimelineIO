@@ -507,11 +507,11 @@ OTIOHeader *otio_composable_effect_get(OTIOHeader *object, uint id)
 }
 
 
-OTIOTime otio_composable_start_time_get(OTIOHeader *object)
+OTIO_RationalTime otio_composable_start_time_get(OTIOHeader *object)
 {
 	if(object->type >= ORIO_OT_COMPOSABLE_END)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -519,17 +519,17 @@ OTIOTime otio_composable_start_time_get(OTIOHeader *object)
 	return ((OTIOComposable *)object)->start_time;
 }
 
-void otio_composable_start_time_set(OTIOHeader *object, OTIOTime start_time)
+void otio_composable_start_time_set(OTIOHeader *object, OTIO_RationalTime start_time)
 {
 	if(object->type < ORIO_OT_COMPOSABLE_END)
 		((OTIOComposable *)object)->start_time = start_time;
 }
 
-OTIOTime otio_composable_duration_time_get(OTIOHeader *object)
+OTIO_RationalTime otio_composable_duration_time_get(OTIOHeader *object)
 {
 	if(object->type >= ORIO_OT_COMPOSABLE_END)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -537,7 +537,7 @@ OTIOTime otio_composable_duration_time_get(OTIOHeader *object)
 	return ((OTIOComposable *)object)->duration_time;
 }
 
-void otio_composable_duration_time_set(OTIOHeader *object, OTIOTime duration)
+void otio_composable_duration_time_set(OTIOHeader *object, OTIO_RationalTime duration)
 {
 	if(object->type < ORIO_OT_COMPOSABLE_END)
 		((OTIOComposable *)object)->duration_time = duration;
@@ -577,11 +577,11 @@ void otio_media_reference_uri_set(OTIOHeader *object, char *uri)
 }
 
 
-OTIOTime otio_media_reference_available_range_get(OTIOHeader *object)
+OTIO_RationalTime otio_media_reference_available_range_get(OTIOHeader *object)
 {
 	if(object->type != ORIO_OT_MEDIA_REFFERENCE)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -589,7 +589,7 @@ OTIOTime otio_media_reference_available_range_get(OTIOHeader *object)
 	return ((OTIOMediaReferences *)object)->available_range;
 }
 
-void otio_media_reference_available_range_set(OTIOHeader *object, OTIOTime available_range)
+void otio_media_reference_available_range_set(OTIOHeader *object, OTIO_RationalTime available_range)
 {
 	if(object->type == ORIO_OT_MEDIA_REFFERENCE)
 		((OTIOMediaReferences *)object)->available_range = available_range;
@@ -612,11 +612,11 @@ void otio_transition_type_set(OTIOHeader *object, char *type)
 }
 
 
-OTIOTime otio_transition_in_time_get(OTIOHeader *object)
+OTIO_RationalTime otio_transition_in_time_get(OTIOHeader *object)
 {
 	if(object->type != ORIO_OT_TRANSITION)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -624,17 +624,17 @@ OTIOTime otio_transition_in_time_get(OTIOHeader *object)
 	return ((OTIOTransition *)object)->in_time;
 }
 
-void otio_transition_in_time_set(OTIOHeader *object, OTIOTime in_time)
+void otio_transition_in_time_set(OTIOHeader *object, OTIO_RationalTime in_time)
 {
 	if(object->type == ORIO_OT_TRANSITION)
 		((OTIOTransition *)object)->in_time = in_time;
 }
 
-OTIOTime otio_transition_out_time_get(OTIOHeader *object)
+OTIO_RationalTime otio_transition_out_time_get(OTIOHeader *object)
 {
 	if(object->type != ORIO_OT_TRANSITION)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -642,17 +642,17 @@ OTIOTime otio_transition_out_time_get(OTIOHeader *object)
 	return ((OTIOTransition *)object)->in_time;
 }
 
-void otio_transition_out_time_set(OTIOHeader *object, OTIOTime out_time)
+void otio_transition_out_time_set(OTIOHeader *object, OTIO_RationalTime out_time)
 {
 	if(object->type == ORIO_OT_TRANSITION)
 		((OTIOTransition *)object)->out_time = out_time;
 }
 
-OTIOTime otio_marker_time_get(OTIOHeader *object)
+OTIO_RationalTime otio_marker_time_get(OTIOHeader *object)
 {
 	if(object->type != ORIO_OT_MARKER)
 	{
-		OTIOTime time;
+		OTIO_RationalTime time;
 		time.time_scale = 0;
 		time.time_scale = 0;
 		return time;
@@ -660,7 +660,7 @@ OTIOTime otio_marker_time_get(OTIOHeader *object)
 	return ((OTIOMarker *)object)->time;
 }
 
-void otio_marker_time_set(OTIOHeader *object, OTIOTime time)
+void otio_marker_time_set(OTIOHeader *object, OTIO_RationalTime time)
 {
 	if(object->type == ORIO_OT_MARKER)
 		((OTIOMarker *)object)->time = time;

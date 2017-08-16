@@ -6,7 +6,7 @@
 
 void otio_generate_random(OTIOObject *parent, uint recursions, uint count, uint *seed)
 {
-	OTIOTime time;
+	OTIO_RationalTime time;
 	OTIOObjectType type;
 	OTIOObject *object, *media;
 	uint i;

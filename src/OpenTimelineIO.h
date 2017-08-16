@@ -5,6 +5,7 @@
 #define OTIO_h
 
 #include <stdio.h>
+#include "OpenTime.h"
 
 
 /* Enable OTIO_DEBUG_MODE to output developer Error messages to standard out. */
@@ -41,11 +42,6 @@ typedef enum{
 #define ORIO_OT_COMPOSABLE_END (ORIO_OT_TRANSITION + 1) /* All OTIOObjectType values LESS then this value are "composable" */
 
 static char *otio_object_type_names[ORIO_OT_COUNT]; /* An array of strings corresponding to the names of the various object types. Handy for debugging printouts.*/
-
-typedef struct {
-	double time_value; /* Number of frames / samples (may not be an integer) */
-    double time_scale; /* Number of frames per second, again may not be an even number Example 29.97 FPS*/
-}OTIOTime;
 
 #ifndef OTIO_INTERNAL
 
@@ -86,10 +82,10 @@ extern OTIOObject	*otio_composable_marker_get(OTIOObject *object, uint id); /* G
 extern uint			otio_composable_effect_count(OTIOObject *object);/* Get the number of effects on the object. */
 extern OTIOObject	*otio_composable_effect_get(OTIOObject *object, uint id); /* Get the a effect on the object. It is recomended for performance to use this function to get the first effect, then use otio_object_next_get to iterate over the effects rather then using the number param. */
 
-extern OTIOTime		otio_composable_start_time_get(OTIOObject *object); /* Get the start time of the composable object. */
-extern void			otio_composable_start_time_set(OTIOObject *object, OTIOTime start_time); /* Set the start time of the composable object. */
-extern OTIOTime		otio_composable_duration_time_get(OTIOObject *object);/* Get the duration time of the composable object. */
-extern void			otio_composable_duration_time_set(OTIOObject *object, OTIOTime duration);/* Set the duration time of the composable object. */
+extern OTIO_RationalTime		otio_composable_start_time_get(OTIOObject *object); /* Get the start time of the composable object. */
+extern void			otio_composable_start_time_set(OTIOObject *object, OTIO_RationalTime start_time); /* Set the start time of the composable object. */
+extern OTIO_RationalTime		otio_composable_duration_time_get(OTIOObject *object);/* Get the duration time of the composable object. */
+extern void			otio_composable_duration_time_set(OTIOObject *object, OTIO_RationalTime duration);/* Set the duration time of the composable object. */
 
 /* Functions only applicable to objects of the type ORIO_OT_MEDIA_REFFERENCE. Media reference objects can only be children to Clips */
 
@@ -104,8 +100,8 @@ extern char			*otio_media_reference_kind_get(OTIOObject *object); /* Get referen
 extern void			otio_media_reference_kind_set(OTIOObject *object, char *kind); /* Set reference kind string */
 extern char			*otio_media_reference_uri_get(OTIOObject *object); /* Get reference uri */
 extern void			otio_media_reference_uri_set(OTIOObject *object, char *uri); /* Set reference uri */
-extern OTIOTime		otio_media_reference_available_range_get(OTIOObject *object); /* Get the available range of the media */
-extern void			otio_media_reference_available_range_set(OTIOObject *object, OTIOTime available_range);/* Set the available range of the media */
+extern OTIO_RationalTime		otio_media_reference_available_range_get(OTIOObject *object); /* Get the available range of the media */
+extern void			otio_media_reference_available_range_set(OTIOObject *object, OTIO_RationalTime available_range);/* Set the available range of the media */
 
 /* Functions only applicable to objects of the type ORIO_OT_TRANSITION. Trasnitions are composable but, always have length 0. */
 
@@ -113,15 +109,15 @@ extern void			otio_media_reference_available_range_set(OTIOObject *object, OTIOT
 
 extern char			*otio_transition_type_get(OTIOObject *object); /* Get Text string to Describe the type of transition */
 extern void			otio_transition_type_set(OTIOObject *object, char *type); /* Set Text string to Describe the type of transition */
-extern OTIOTime		otio_transition_in_time_get(OTIOObject *object); /* Get the time the transition encrotches on the previous composable objects. */
-extern void			otio_transition_in_time_set(OTIOObject *object, OTIOTime in_time); /* Set the time the transition encrotches on the previous composable objects. */
-extern OTIOTime		otio_transition_out_time_get(OTIOObject *object); /* Get the time the transition encrotches on the following composable objects. */
-extern void			otio_transition_out_time_set(OTIOObject *object, OTIOTime out_time); /* Set the time the transition encrotches on the following composable objects. */
+extern OTIO_RationalTime		otio_transition_in_time_get(OTIOObject *object); /* Get the time the transition encrotches on the previous composable objects. */
+extern void			otio_transition_in_time_set(OTIOObject *object, OTIO_RationalTime in_time); /* Set the time the transition encrotches on the previous composable objects. */
+extern OTIO_RationalTime		otio_transition_out_time_get(OTIOObject *object); /* Get the time the transition encrotches on the following composable objects. */
+extern void			otio_transition_out_time_set(OTIOObject *object, OTIO_RationalTime out_time); /* Set the time the transition encrotches on the following composable objects. */
 
 /* Functions only applicable to objects of the type ORIO_OT_MARKER */
 
-extern OTIOTime		otio_marker_time_get(OTIOObject *object); /* get the time stamp of the marker relative to its parents start time */
-extern void			otio_marker_time_set(OTIOObject *object, OTIOTime time); /* set the time stamp of the marker relative to its parents start time */
+extern OTIO_RationalTime		otio_marker_time_get(OTIOObject *object); /* get the time stamp of the marker relative to its parents start time */
+extern void			otio_marker_time_set(OTIOObject *object, OTIO_RationalTime time); /* set the time stamp of the marker relative to its parents start time */
 extern char			*otio_marker_message_get(OTIOObject *object); /* get the maker message string */
 extern void			 otio_marker_message_set(OTIOObject *object, char *message); /* set the maker message string */
 
