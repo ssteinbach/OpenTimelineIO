@@ -14,3 +14,4 @@ python: opentime test_opentime.py setup.py
 
 clean:
 	rm libopentime.so test_ot
+	rm -rf build

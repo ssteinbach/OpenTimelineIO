@@ -24,6 +24,20 @@ OT_rt_to_time_base_f(
     return result;
 }
 
+// @{ implemented
+OT_RationalTime_t
+OT_rt_rescaled_to_rt(OT_RationalTime_t* input_rt, OT_RationalTime_t* result_rt)
+{
+    return OT_rt_rescaled_to_d(input_rt->rate, result_rt);
+}
+
+OT_RationalTime_t
+OT_rt_rescaled_to_rt(OT_RationalTime_t* input_rt, OT_RationalTime_t* result_rt)
+{
+    return OT_rt_rescaled_to_d(input_rt->rate, result_rt);
+}
+// @}
+
 struct OT_RationalTime_t
 OT_rt_to_time_base_rt(
         const struct OT_RationalTime_t source,
