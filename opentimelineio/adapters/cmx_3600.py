@@ -238,6 +238,17 @@ class ClipHandler(object):
         self.clip = self.make_clip(comment_data)
 
     def make_clip(self, comment_data):
+
+        # record_range = otio.opentime.range_from_start_end_time(
+        #     otio.opentime.from_timecode(self.record_tc_in, self.edl_rate),
+        #     otio.opentime.from_timecode(self.record_tc_out, self.edl_rate)
+        # )
+
+        source_range = otio.opentime.range_from_start_end_time(
+            otio.opentime.from_timecode(self.source_tc_in, self.edl_rate),
+            otio.opentime.from_timecode(self.source_tc_out, self.edl_rate)
+        )
+
         if self.reel == 'BL':
             # TODO make this an explicit path
             # this is the only special tape name code we care about
@@ -305,6 +316,53 @@ class ClipHandler(object):
                     }
                 }
 
+            motion_effect = comment_data.get('motion_effect')
+            if motion_effect:
+                m = re.match(
+                    r'(\S+)\s+([\d.]+)\s+(\d\d:\d\d:\d\d:\d\d)',
+                    motion_effect
+                )
+
+                try:
+                    # TODO: What is this reel for?
+                    reel = m.group(1)
+                    fps = float(m.group(2))
+                    # TODO: What is this timecode for?
+                    tc = otio.opentime.from_timecode(m.group(3), self.edl_rate)
+                except:
+                    print EDLParseError(
+                        'Invalid M2 found: {}'.format(motion_effect)
+                        )
+                    raise
+
+                if fps == 0:
+                    # Handle freeze frames later
+                    comment_data['freeze_frame'] = True
+                else:
+                    effect = otio.schema.Effect()
+                    effect.name = "M2"
+                    effect.effect_name = "FrameRateAdjustment"
+                    effect.metadata["fps"] = fps
+
+                    # if record_range.duration != source_range.duration:
+                    #    print "STRETCH:", source_range, "->", record_range
+                    #    print "Effect fps:", fps
+                    #    sdur = otio.opentime.to_seconds(source_range.duration)
+                    #    rdur = otio.opentime.to_seconds(record_range.duration)
+                    #    print "Computed:", (sdur / rdur) * self.edl_rate
+
+                    effect.metadata["reel"] = reel
+                    effect.metadata["timecode"] = tc
+
+                    clip.effects.append(effect)
+
+            freeze_frame = comment_data.get('freeze_frame')
+            if freeze_frame:
+                effect = otio.schema.Effect()
+                effect.name = "FF"
+                effect.effect_name = "FreezeFrame"
+                clip.effects.append(effect)
+
             if 'locator' in comment_data:
                 # An example EDL locator line looks like this:
                 # * LOC: 01:00:01:14 RED     ANIM FIX NEEDED
@@ -353,10 +411,7 @@ class ClipHandler(object):
                     # TODO: Should we report this as a warning somehow?
                     pass
 
-        clip.source_range = otio.opentime.range_from_start_end_time(
-            otio.opentime.from_timecode(self.source_tc_in, self.edl_rate),
-            otio.opentime.from_timecode(self.source_tc_out, self.edl_rate)
-        )
+        clip.source_range = source_range
 
         return clip
 
@@ -404,7 +459,7 @@ class ClipHandler(object):
 
 class CommentHandler(object):
     # this is the for that all comment 'id' tags take
-    regex_template = '\*\s*{id}:?\s+(?P<comment_body>.*)'
+    regex_template = '\*?\s*{id}:?\s+(?P<comment_body>.*)'
 
     # this should be a map of all known comments that we can read
     # 'FROM CLIP' is a required comment to link media
@@ -415,6 +470,8 @@ class CommentHandler(object):
             ('LOC', 'locator'),
             ('ASC_SOP', 'asc_sop'),
             ('ASC_SAT', 'asc_sat'),
+            ('M2', 'motion_effect'),
+            ('FREEZE FRAME', 'freeze_frame'),
         ]
     )
 
@@ -535,8 +592,8 @@ def expand_transitions(timeline):
         track[track.index(from_clip)] = to_transition
 
     for (track, clip_to_remove) in list(set(remove_list)):
-        # if clip_to_remove in track:
-        track.remove(clip_to_remove)
+        if clip_to_remove in track:
+            track.remove(clip_to_remove)
 
     for (track, clip) in append_list:
         track.append(clip)

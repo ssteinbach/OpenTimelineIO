@@ -37,6 +37,7 @@ SCREENING_EXAMPLE_PATH = os.path.join(SAMPLE_DATA_DIR, "screening_example.edl")
 NO_SPACES_PATH = os.path.join(SAMPLE_DATA_DIR, "no_spaces_test.edl")
 DISSOLVE_TEST = os.path.join(SAMPLE_DATA_DIR, "dissolve_test.edl")
 DISSOLVE_TEST_2 = os.path.join(SAMPLE_DATA_DIR, "dissolve_test_2.edl")
+EFFECTS_TEST = os.path.join(SAMPLE_DATA_DIR, "effects.edl")
 
 
 class EDLAdapterTest(unittest.TestCase):
@@ -292,6 +293,32 @@ class EDLAdapterTest(unittest.TestCase):
         self.assertTrue(isinstance(tl.tracks[0][2], otio.schema.Gap))
         self.assertEqual(tl.tracks[0][2].duration().value, 12)
         self.assertEqual(tl.tracks[0][2].source_range.start_time.value, 0)
+
+    def test_speed_effects(self):
+        tl = otio.adapters.read_from_file(EFFECTS_TEST)
+        track = tl.tracks[0]
+        self.assertEqual(len(track), 25)
+
+        clip = track[13]
+        self.assertEqual(clip.name, "Z095_9D (LAY1) FF")
+        self.assertEqual(clip.source_range, otio.opentime.TimeRange(
+            otio.opentime.from_timecode("01:00:08:01", 24),
+            otio.opentime.RationalTime(1, 24),
+        ))
+        self.assertEqual(len(clip.effects), 1)
+        effect = clip.effects[0]
+        self.assertEqual(effect.effect_name, "FreezeFrame")
+
+        clip = track[16]
+        self.assertEqual(clip.name, "Z095_13D (LAY1) (47.61 FPS)")
+        self.assertEqual(clip.source_range, otio.opentime.TimeRange(
+            otio.opentime.from_timecode("01:00:04:05", 24),
+            otio.opentime.RationalTime(3*24+15, 24),
+        ))
+        self.assertEqual(len(clip.effects), 1)
+        effect = clip.effects[0]
+        self.assertEqual(effect.effect_name, "FrameRateAdjustment")
+        self.assertEqual(effect.metadata.get("fps"), 47.6)
 
 
 if __name__ == '__main__':
