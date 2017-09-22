@@ -239,10 +239,10 @@ class ClipHandler(object):
 
     def make_clip(self, comment_data):
 
-        # record_range = otio.opentime.range_from_start_end_time(
-        #     otio.opentime.from_timecode(self.record_tc_in, self.edl_rate),
-        #     otio.opentime.from_timecode(self.record_tc_out, self.edl_rate)
-        # )
+        record_range = otio.opentime.range_from_start_end_time(
+            otio.opentime.from_timecode(self.record_tc_in, self.edl_rate),
+            otio.opentime.from_timecode(self.record_tc_out, self.edl_rate)
+        )
 
         source_range = otio.opentime.range_from_start_end_time(
             otio.opentime.from_timecode(self.source_tc_in, self.edl_rate),
@@ -340,8 +340,8 @@ class ClipHandler(object):
                     comment_data['freeze_frame'] = True
                 else:
                     effect = otio.schema.Effect()
-                    effect.name = "M2"
-                    effect.effect_name = "FrameRateAdjustment"
+                    effect.name = "FrameRateAdjustment"
+                    effect.effect_name = "TimeEffect"
                     effect.metadata["fps"] = fps
 
                     # if record_range.duration != source_range.duration:
@@ -353,14 +353,16 @@ class ClipHandler(object):
 
                     effect.metadata["reel"] = reel
                     effect.metadata["timecode"] = tc
+                    effect.metadata["duration"] = record_range.duration
 
                     clip.effects.append(effect)
 
             freeze_frame = comment_data.get('freeze_frame')
             if freeze_frame:
                 effect = otio.schema.Effect()
-                effect.name = "FF"
-                effect.effect_name = "FreezeFrame"
+                effect.name = "FreezeFrame"
+                effect.effect_name = "TimeEffect"
+                effect.metadata["duration"] = record_range.duration
                 clip.effects.append(effect)
 
             if 'locator' in comment_data:
@@ -523,7 +525,16 @@ def expand_transitions(timeline):
                 clip = next_clip
                 next_clip = next(track_iter, None)
                 continue
-            if transition_type not in ['D']:
+            elif transition_type == 'D':
+                pass
+            # elif transition_type == 'K':
+            #     # nothing to do, continue to the next iteration of the loop
+            #     prev_prev = prev
+            #     prev = clip
+            #     clip = next_clip
+            #     next_clip = next(track_iter, None)
+            #     continue
+            else:
                 raise EDLParseError(
                     "Transition type '{}' not supported by the CMX EDL reader "
                     "currently.".format(transition_type)

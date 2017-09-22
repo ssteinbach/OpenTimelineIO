@@ -87,3 +87,17 @@ class Effect(core.SerializableObject):
                 repr(self.metadata),
             )
         )
+
+#
+# @core.register_type
+# class TimeEffect(Effect):
+#     _serializable_label = "TimeEffect.1"
+
+    def apply_to_duration(self, duration):
+
+        if self.effect_name == "TimeEffect":
+            # if self.name == "FreezeFrame":
+            # elif self.name == "FrameRateAdjustment":
+            duration = self.metadata.get("duration", duration)
+
+        return duration

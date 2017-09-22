@@ -305,21 +305,39 @@ class EDLAdapterTest(unittest.TestCase):
             otio.opentime.from_timecode("01:00:08:01", 24),
             otio.opentime.RationalTime(1, 24),
         ))
+        self.assertEqual(tl.range_of_child(clip), otio.opentime.TimeRange(
+            otio.opentime.from_timecode("00:01:18:23", 24),
+            otio.opentime.RationalTime(2, 24),
+        ))
         self.assertEqual(len(clip.effects), 1)
         effect = clip.effects[0]
-        self.assertEqual(effect.effect_name, "FreezeFrame")
+        self.assertEqual(effect.name, "FreezeFrame")
+        self.assertEqual(effect.effect_name, "TimeEffect")
 
         clip = track[16]
         self.assertEqual(clip.name, "Z095_13D (LAY1) (47.61 FPS)")
         self.assertEqual(clip.source_range, otio.opentime.TimeRange(
             otio.opentime.from_timecode("01:00:04:05", 24),
-            otio.opentime.RationalTime(3*24+15, 24),
+            otio.opentime.RationalTime(87, 24),
+        ))
+        self.assertEqual(tl.range_of_child(clip), otio.opentime.TimeRange(
+            otio.opentime.from_timecode("00:01:22:09", 24),
+            otio.opentime.RationalTime(44, 24),
         ))
         self.assertEqual(len(clip.effects), 1)
         effect = clip.effects[0]
-        self.assertEqual(effect.effect_name, "FrameRateAdjustment")
+        self.assertEqual(effect.name, "FrameRateAdjustment")
+        self.assertEqual(effect.effect_name, "TimeEffect")
         self.assertEqual(effect.metadata.get("fps"), 47.6)
 
+    def test_speed_effects_round_trip(self):
+        self.maxDiff = None
+        original = open(EFFECTS_TEST, "r").read()
+        tl = otio.adapters.read_from_string(original, "cmx_3600")
+        middle = otio.adapters.write_to_string(tl, "cmx_3600")
+        tl = otio.adapters.read_from_string(middle, "cmx_3600")
+        output = otio.adapters.write_to_string(tl, "cmx_3600")
+        self.assertMultiLineEqual(middle, output)
 
 if __name__ == '__main__':
     unittest.main()
