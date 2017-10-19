@@ -86,6 +86,10 @@ class EDLAdapterTest(unittest.TestCase):
         self.assertEqual(marker.name, "ANIM FIX NEEDED")
         self.assertEqual(marker.metadata.get("cmx_3600").get("color"), "RED")
         self.assertEqual(
+            otio.opentime.to_timecode(marker.marked_range.start_time, fps),
+            "01:00:01:14"
+        )
+        self.assertEqual(
             marker.marked_range.start_time,
             otio.opentime.from_timecode("01:00:01:14", fps)
         )

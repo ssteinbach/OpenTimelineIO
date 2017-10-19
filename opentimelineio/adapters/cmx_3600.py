@@ -544,10 +544,25 @@ def expand_transitions(timeline):
     return timeline
 
 
+def localized_marker_times(result):
+    for clip in result.each_clip():
+        if not clip.markers:
+            continue
+
+        for marker in clip.markers:
+            # subtract the start time in the parent of the clip
+            marker.marked_range.start_time -= (
+                clip.trimmed_range_in_parent().start_time
+            )
+
+    return result
+
+
 def read_from_string(input_str):
     parser = EDLParser(input_str)
     result = parser.timeline
     result = expand_transitions(result)
+    result = localized_marker_times(result)
     return result
 
 
@@ -666,7 +681,10 @@ def write_to_string(input_otio):
         # Output any markers on this clip
         for marker in clip.markers:
             timecode = otio.opentime.to_timecode(
-                marker.marked_range.start_time,
+                (
+                    clip.trimmed_range_in_parent().start_time 
+                    + marker.marked_range.start_time
+                ),
                 edl_rate
             )
 
