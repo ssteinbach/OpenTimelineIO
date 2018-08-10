@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 import opentimelineio as otio
 
-import argparse, copy, StringIO,pstats
+import argparse
+import copy
+import StringIO
+import pstats
+
 
 def parse_args():
     """ parse arguments out of sys.argv """
@@ -23,21 +27,24 @@ def parse_args():
         '-t',
         '--test',
         nargs='+',
-        choices =  TESTS.keys(),
+        choices=TESTS.keys(),
         help="Which choices to run.",
     )
 
     return parser.parse_args()
 
+
 def construct_track(g, trange, base_track, num):
     return base_track.extend(copy.deepcopy(g) for i in range(num))
+
 
 def compute_range(obj):
     for thing in obj:
         thing.range_in_parent()
 
-TESTS = {
-}
+
+TESTS = {}
+
 
 def profile_test(func):
     TESTS[func.__name__] = func
@@ -75,6 +82,7 @@ def main():
         ps = pstats.Stats(prof, stream=s).sort_stats(sortby)
         ps.print_stats()
         print s.getvalue()
+
 
 if __name__ == '__main__':
     main()
