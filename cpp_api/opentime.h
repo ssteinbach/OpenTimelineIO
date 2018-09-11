@@ -69,6 +69,10 @@ public:
         value(0),
         rate(1)
     {}
+    RationalTime(const RationalTime& in):
+        value(in.value),
+        rate(in.rate)
+    {}
 
     // data
     rt_value_t value;
