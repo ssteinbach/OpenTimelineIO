@@ -1237,6 +1237,18 @@ class TrackTest(unittest.TestCase, otio.test_utils.OTIOAssertions):
         )
         self.assertJsonEqual(neighbors, (seq[4], fill))
 
+    def test_track_child_range_map(self):
+        edl_path = TRANSITION_EXAMPLE_PATH
+        timeline = otio.adapters.read_from_file(edl_path)
+        tr = timeline.tracks[0]
+        mp = tr.child_range_map()
+
+        # fetch all the valid children that should be in the map
+        vc = list(tr.each_clip())
+
+        self.assertEqual(mp[vc[0]].start_time.value, 0)
+        self.assertEqual(mp[vc[1]].start_time, mp[vc[0]].duration)
+
 
 class EdgeCases(unittest.TestCase):
 

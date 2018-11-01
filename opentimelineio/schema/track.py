@@ -198,6 +198,43 @@ class Track(core.Composition):
             next_item
         )
 
+    def child_range_map(self):
+        """Build a dict mapping children to their range in this track."""
+
+        # valid_children = [
+        #     i for i in self._children 
+        #     if not isinstance(i, transition.Transition)
+        # ]
+        valid_children = self._children
+
+        if not valid_children:
+            return {}
+
+        result_map = {}
+
+        # set the rate of the first time to equal the rate of the end point of
+        # the first clip in the thing
+        last_end_time = opentime.RationalTime(
+            0,
+            (c for c in self.each_clip()).next().trimmed_range().end_time_exclusive().rate
+        )
+
+        for thing in valid_children:
+            if isinstance(thing, transition.Transition):
+                result_map[thing] = opentime.TimeRange(
+                    last_end_time - thing.in_offset,
+                    last_end_time + thing.out_offset,
+                )
+            else:
+                last_range = opentime.TimeRange(
+                    last_end_time,
+                    thing.trimmed_range().duration
+                )
+                result_map[thing] = last_range
+                last_end_time = last_range.end_time_exclusive()
+
+        return result_map
+
 
 # the original name for "track" was "sequence" - this will turn "Sequence"
 # found in OTIO files into Track automatically.

@@ -44,18 +44,7 @@ def flatten_stack(in_stack):
     flat_track.name = "Flattened"
 
     # map of item to range_in_parent
-    range_map = {}
-    skips = [0]
-    for track in in_stack:
-        last_end = opentime.RationalTime(0, track[0].trimmed_range().start_time.rate)
-        for item in (i for i in track if not isinstance(i, schema.Transition)):
-            dur = item.trimmed_range().duration
-            range_map[item] = opentime.TimeRange(
-                last_end,
-                dur
-            )
-            last_end += dur
-
+    range_track_map = {}
 
     def _get_next_item(
             in_stack,
@@ -72,6 +61,12 @@ def flatten_stack(in_stack):
         track = in_stack[track_index]
         if trim_range is not None:
             track = track_algo.track_trimmed_to_range(track, trim_range)
+
+        track_map = range_track_map.get(track)
+        if track_map is None:
+            track_map = track.child_range_map()
+            range_track_map[track] = track_map
+
         for item in track:
             if (
                     item.visible()
@@ -80,11 +75,10 @@ def flatten_stack(in_stack):
             ):
                 yield item
             else:
-                if item not in range_map:
-                    print "skip, ", skips[0]
-                    skips[0] += 1 
+                if item not in track_map:
+                    print "skip, ", item
                     continue
-                trim = range_map[item]
+                trim = track_map[item]
                 if trim_range is not None:
                     trim.start_time += trim_range.start_time
                 for more in _get_next_item(in_stack, track_index - 1, trim):

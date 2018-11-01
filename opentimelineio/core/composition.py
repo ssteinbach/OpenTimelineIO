@@ -472,6 +472,7 @@ class Composition(item.Item, collections.MutableSequence):
         """Explicit contains so that it uses 'is' rather than '=='"""
 
         # from fastest to slowest...
+        # return other in self._set_hashes
         return hash(other) in self._set_hashes
 
         return other in self._children
@@ -529,6 +530,7 @@ class Composition(item.Item, collections.MutableSequence):
 
         item._set_parent(self)
         self._children.insert(index, item)
+        # self._set_hashes.add(item)
         self._set_hashes.add(hash(item))
 
     def __len__(self):
