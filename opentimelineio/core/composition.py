@@ -67,6 +67,7 @@ class Composition(item.Item, collections.MutableSequence):
         )
         collections.MutableSequence.__init__(self)
 
+        self._set_hashes = set()
         self._children = []
         if children:
             # cannot simply set ._children to children since __setitem__ runs
@@ -467,6 +468,17 @@ class Composition(item.Item, collections.MutableSequence):
             for val in value:
                 val._set_parent(self)
 
+    def __contains__(self, other):
+        """Explicit contains so that it uses 'is' rather than '=='"""
+
+        # from fastest to slowest...
+        return hash(other) in self._set_hashes
+
+        return other in self._children
+
+        # return any(other is i for i in self._children)
+        return any(other is i for i in self._children)
+
     def __setitem__(self, key, value):
         # fetch the current thing at that index/slice
         old = self._children[key]
@@ -517,6 +529,7 @@ class Composition(item.Item, collections.MutableSequence):
 
         item._set_parent(self)
         self._children.insert(index, item)
+        self._set_hashes.add(hash(item))
 
     def __len__(self):
         """The len() of a Composition is the # of children in it.

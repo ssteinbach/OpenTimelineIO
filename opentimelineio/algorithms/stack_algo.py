@@ -27,7 +27,8 @@ __doc__ = """ Algorithms for stack objects. """
 import copy
 
 from .. import (
-    schema
+    schema,
+    opentime,
 )
 from . import (
     track_algo
@@ -41,6 +42,20 @@ def flatten_stack(in_stack):
 
     flat_track = schema.Track()
     flat_track.name = "Flattened"
+
+    # map of item to range_in_parent
+    range_map = {}
+    skips = [0]
+    for track in in_stack:
+        last_end = opentime.RationalTime(0, track[0].trimmed_range().start_time.rate)
+        for item in (i for i in track if not isinstance(i, schema.Transition)):
+            dur = item.trimmed_range().duration
+            range_map[item] = opentime.TimeRange(
+                last_end,
+                dur
+            )
+            last_end += dur
+
 
     def _get_next_item(
             in_stack,
@@ -65,7 +80,11 @@ def flatten_stack(in_stack):
             ):
                 yield item
             else:
-                trim = item.range_in_parent()
+                if item not in range_map:
+                    print "skip, ", skips[0]
+                    skips[0] += 1 
+                    continue
+                trim = range_map[item]
                 if trim_range is not None:
                     trim.start_time += trim_range.start_time
                 for more in _get_next_item(in_stack, track_index - 1, trim):
