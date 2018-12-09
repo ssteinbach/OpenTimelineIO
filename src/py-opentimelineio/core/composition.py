@@ -1,0 +1,31 @@
+from . _core_utils import add_method
+from opentimelineio import _otio
+
+@add_method(_otio.Composition)
+def __str__(self):
+    return "{}({}, {}, {}, {})".format(
+        self.__class__.__name__,
+        str(self.name),
+        str(list(self)),
+        str(self.source_range),
+        str(self.metadata)
+    )
+
+@add_method(_otio.Composition)
+def __repr__(self):
+    return (
+        "otio.{}.{}("
+        "name={}, "
+        "children={}, "
+        "source_range={}, "
+        "metadata={}"
+        ")".format(
+            "core" if self.__class__ is _otio.Composition else "schema",
+            self.__class__.__name__,
+            repr(self.name),
+            repr(list(self)),
+            repr(self.source_range),
+            repr(self.metadata)
+        )
+    )
+
