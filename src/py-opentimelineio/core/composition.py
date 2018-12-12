@@ -31,23 +31,19 @@ def __repr__(self):
 
 @add_method(_otio.Composition)
 def each_child(self, search_range=None, descended_from_type=_otio.Composable):
+    is_descendant = descended_from_type is _otio.Composable
     for i, child in enumerate(self):
         # filter out children who are not in the search range
-        if search_range and not self.range_of_child_at_index(i).overlaps(
-                search_range):
+        if search_range and not self.range_of_child_at_index(i).overlaps(search_range):
             continue
 
         # filter out children who are not descended from the specified type
-        is_descendant = descended_from_type == composable.Composable
+
         if is_descendant or isinstance(child, descended_from_type):
             yield child
 
         # for children that are compositions, recurse into their children
         if hasattr(child, "each_child"):
-            for valid_child in (
-                c for c in child.each_child(
-                    search_range,
-                    descended_from_type
-                )
-            ):
-                yield valid_child
+            for c in child.each_child(search_range, descended_from_type):
+                yield c
+                
