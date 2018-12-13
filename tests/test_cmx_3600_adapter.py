@@ -174,13 +174,14 @@ class EDLAdapterTest(unittest.TestCase, otio.test_utils.OTIOAssertions):
             media_reference=mr,
             source_range=tr,
         )
-        cl4.effects = [otio.schema.FreezeFrame()]
+
+        cl4.effects[:] = [otio.schema.FreezeFrame()]
         cl5 = otio.schema.Clip(
             name="test clip5 (speed)",
             media_reference=mr,
             source_range=tr,
         )
-        cl5.effects = [otio.schema.LinearTimeWarp(time_scalar=2.0)]
+        cl5.effects[:] = [otio.schema.LinearTimeWarp(time_scalar=2.0)]
         track.name = "V"
         track.append(cl)
         track.extend([cl2, cl3])
