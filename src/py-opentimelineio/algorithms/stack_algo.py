@@ -35,7 +35,7 @@ from . import (
 )
 
 
-def flatten_stack(in_stack):
+def xx_flatten_stack(in_stack):
     """Flatten a Stack, or a list of Tracks, into a single Track.
     Note that the 1st Track is the bottom one, and the last is the top.
     """
@@ -89,3 +89,8 @@ def flatten_stack(in_stack):
         flat_track.append(copy.deepcopy(item))
 
     return flat_track
+
+import opentimelineio as otio
+flatten_stack = otio._otio.flatten_stack
+
+

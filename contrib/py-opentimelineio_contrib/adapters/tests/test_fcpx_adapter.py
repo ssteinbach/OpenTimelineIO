@@ -40,9 +40,9 @@ class AdaptersFcpXXmlTest(unittest.TestCase, otio.test_utils.OTIOAssertions):
         self.assertEqual(len(audio_tracks), 1)
 
         video_clip_names = (
-            ('IMG_0023', None, 'IMG_0268'),
-            (None, 'OpenTimelineIO_1 Clip'),
-            (None, 'IMG_0715', None, 'IMG_0715')
+            ('IMG_0023', '', 'IMG_0268'),
+            ('', 'OpenTimelineIO_1 Clip'),
+            ('', 'IMG_0715', '', 'IMG_0715')
         )
 
         for n, track in enumerate(video_tracks):
