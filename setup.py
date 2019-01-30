@@ -36,28 +36,22 @@ setup(
     description='Blah',
     long_description='',
     test_suite='setup.test_otio',
-    include_package_data=False,
-    # packags=setuptools.find_packages(include=["python"]),
+    include_package_data=True,
     packages=[
         'opentimelineio',
-        'opentimelineio.adapters',
-        'opentimelineio.algorithms',
-        'opentimelineio.core',
-        'opentimelineio.schema',
-        'opentimelineio.schemadef',
-        'opentimelineio.plugins',
         # 'opentimelineio.console',
         # 'opentimelineio_contrib',
         # 'opentimelineio_contrib.adapters',
         'opentimelineview',
     ],
     package_dir={
-        "":"python",
-        "opentimelineio_contrib":"contrib/py-opentimelineio_contrib",
+        "":"python"
     },
     package_data={
         'opentimelineio': [
             'adapters/builtin_adapters.plugin_manifest.json',
+            'lib/libopentimelineio.so',
+            'lib/libopentime.so',
         ],
         # 'opentimelineio_contrib': [
         #     'adapters/contrib_adapters.plugin_manifest.json',
