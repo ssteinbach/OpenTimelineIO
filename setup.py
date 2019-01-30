@@ -37,23 +37,31 @@ setup(
     long_description='',
     test_suite='setup.test_otio',
     include_package_data=False,
+    # packags=setuptools.find_packages(include=["python"]),
     packages=[
         'opentimelineio',
+        'opentimelineio.adapters',
+        'opentimelineio.algorithms',
+        'opentimelineio.core',
+        'opentimelineio.schema',
+        'opentimelineio.schemadef',
+        'opentimelineio.plugins',
+        # 'opentimelineio.console',
+        # 'opentimelineio_contrib',
+        # 'opentimelineio_contrib.adapters',
         'opentimelineview',
-        'opentimelineio_contrib',
     ],
     package_dir={
-        "opentimelineview":"python/opentimelineview",
-        "opentimelineio":"python/py-opentimelineio",
+        "":"python",
         "opentimelineio_contrib":"contrib/py-opentimelineio_contrib",
     },
     package_data={
         'opentimelineio': [
             'adapters/builtin_adapters.plugin_manifest.json',
         ],
-        'opentimelineio_contrib': [
-            'adapters/contrib_adapters.plugin_manifest.json',
-        ]
+        # 'opentimelineio_contrib': [
+        #     'adapters/contrib_adapters.plugin_manifest.json',
+        # ]
     },
     # because we need to open() the adapters manifest, we aren't zip-safe
     zip_safe=False,
