@@ -19,7 +19,5 @@ install(DIRECTORY
         FILES_MATCHING PATTERN "*.py"
                        PATTERN "*.json")
 
-file(COPY opentimelineio DESTINATION python/opentimelineio)
-
 add_subdirectory(opentime-bindings)
 add_subdirectory(opentimelineio-bindings)
