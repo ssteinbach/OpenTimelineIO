@@ -37,6 +37,7 @@ setup(
     long_description='',
     test_suite='setup.test_otio',
     include_package_data=True,
+    cmake_args=['-DCMAKE_SKIP_BUILD_RPATH=1'],
     packages=[
         'opentimelineio',
         # 'opentimelineio.console',
