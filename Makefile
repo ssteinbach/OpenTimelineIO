@@ -42,7 +42,7 @@ test-core: python-version
 
 test-contrib: python-version
 	@echo "$(ccgreen)Running Contrib tests...$(ccend)"
-	@make -C opentimelineio_contrib/adapters test VERBOSE=$(VERBOSE)
+	@make -C contrib/opentimelineio_contrib/adapters test VERBOSE=$(VERBOSE)
 
 python-version:
 	@python --version

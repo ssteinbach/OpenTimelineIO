@@ -33,6 +33,7 @@ import opentimelineio as otio
 SAMPLE_DATA_DIR = os.path.join(
     os.path.dirname(otio.__file__),
     "..",
+    "..",
     "tests",
     "sample_data"
 )
