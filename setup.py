@@ -9,6 +9,7 @@ import sys
 import platform
 import subprocess
 import unittest
+import pip
 
 from setuptools import (
     setup,
@@ -16,8 +17,10 @@ from setuptools import (
     find_packages,
 )
 
-from setuptools.command.build_ext import build_ext
+import setuptools.command.build_ext
+import setuptools.command.build_py
 from distutils.version import LooseVersion
+import distutils
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -25,7 +28,7 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
 
 
-class CMakeBuild(build_ext):
+class CMakeBuild(setuptools.command.build_ext.build_ext):
     def run(self):
         try:
             out = subprocess.check_output(['cmake', '--version'])
@@ -81,6 +84,112 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
 
+# Make sure the environment contains an up to date enough version of pip.
+PIP_VERSION = pip.__version__
+REQUIRED_PIP_VERSION = "6.0.0"
+if (
+        distutils.version.StrictVersion(PIP_VERSION)
+        <= distutils.version.StrictVersion(REQUIRED_PIP_VERSION)
+):
+    sys.stderr.write(
+        "Your pip version is: '{}', OpenTimelineIO requires at least "
+        "version '{}'.  Please update pip by running:\n"
+        "pip install -U pip\n".format(
+            PIP_VERSION,
+            REQUIRED_PIP_VERSION,
+        )
+    )
+    sys.exit(1)
+
+
+# Make sure the environment contains an up to date enough version of setuptools.
+try:
+    import setuptools.version
+    SETUPTOOLS_VERSION = setuptools.version.__version__
+except ImportError:
+    SETUPTOOLS_VERSION = setuptools.__version__
+
+REQUIRED_SETUPTOOLS_VERSION = '20.5.0'
+if (
+    distutils.version.StrictVersion(SETUPTOOLS_VERSION)
+    <= distutils.version.StrictVersion(REQUIRED_SETUPTOOLS_VERSION)
+):
+    sys.stderr.write(
+        "Your setuptools version is: '{}', OpenTimelineIO requires at least "
+        "version '{}'.  Please update setuptools by running:\n"
+        "pip install -U setuptools\n".format(
+            SETUPTOOLS_VERSION,
+            REQUIRED_SETUPTOOLS_VERSION,
+        )
+    )
+    sys.exit(1)
+
+
+# check the python version first
+if (
+    sys.version_info[0] < 2 or
+    (sys.version_info[0] == 2 and sys.version_info[1] < 7)
+):
+    sys.exit(
+        'OpenTimelineIO requires python2.7 or greater, detected version:'
+        ' {}.{}'.format(
+            sys.version_info[0],
+            sys.version_info[1]
+        )
+    )
+
+# Metadata that gets stamped into the __init__ files during the build phase.
+PROJECT_METADATA = {
+    "version": "0.10.0.dev1",
+    "author": 'Pixar Animation Studios',
+    "author_email": 'opentimelineio@pixar.com',
+    "license": 'Modified Apache 2.0 License',
+}
+
+METADATA_TEMPLATE = """
+__version__ = "{version}"
+__author__ = "{author}"
+__author_email__ = "{author_email}"
+__license__ = "{license}"
+"""
+
+
+def _append_version_info_to_init_scripts(build_lib):
+    """Stamp PROJECT_METADATA into __init__ files."""
+
+    for module, parentdir in [
+            ("opentimelineio", "python"),
+            ("opentimelineio_contrib", "contrib"),
+            ("opentimelineview", "python")
+    ]:
+        target_file = os.path.join(build_lib, module, "__init__.py")
+        source_file = os.path.join(
+            os.path.dirname(__file__),
+            parentdir,
+            module,
+            "__init__.py"
+        )
+
+        # get the base data from the original file
+        with open(source_file, 'r') as fi:
+            src_data = fi.read()
+
+        # write that + the suffix to the target file
+        with open(target_file, 'w') as fo:
+            fo.write(src_data)
+            fo.write(METADATA_TEMPLATE.format(**PROJECT_METADATA))
+
+
+class AddMetadataToInits(setuptools.command.build_py.build_py):
+    """Stamps PROJECT_METADATA into __init__ files."""
+
+    def run(self):
+        setuptools.command.build_py.build_py.run(self)
+
+        if not self.dry_run:
+            _append_version_info_to_init_scripts(self.build_lib)
+
+
 def test_otio():
     """Discovers and runs tests"""
     try:
@@ -90,38 +199,82 @@ def test_otio():
         pass
     return unittest.TestLoader().discover('tests')
 
+
+# copied from first paragraph of README.md
+LONG_DESCRIPTION = """OpenTimelineIO is an interchange format and API for
+editorial cut information. OTIO is not a container format for media, rather it
+contains information about the order and length of cuts and references to
+external media.
+
+OTIO includes both a file format and an API for manipulating that format. It
+also includes a plugin architecture for writing adapters to convert from/to
+existing editorial timeline formats. It also implements a dependency- less
+library for dealing strictly with time, opentime.
+
+You can provide adapters for your video editing tool or pipeline as needed.
+Each adapter allows for import/export between that proprietary tool and the
+OpenTimelineIO format."""
+
 setup(
-    name='opentimelineio',
-    version='0.9.1',
-    author='Pixar Animation Studios',
-    author_email='foo@bar.com',
-    description='Blah',
-    long_description='',
-    test_suite='setup.test_otio',
-    include_package_data=True,
-    packages=find_packages(where="python"),
-    ext_modules=[
-        CMakeExtension('_opentimelineio'),
-        CMakeExtension('_opentime')
-    ],
-    cmdclass=dict(build_ext=CMakeBuild),
-    package_dir={
-        "":"python"
+    name='OpenTimelineIO',
+    description='Editorial interchange format and API',
+    long_description=LONG_DESCRIPTION,
+    url='http://opentimeline.io',
+    project_urls={
+        'Source':
+            'https://github.com/PixarAnimationStudios/OpenTimelineIO',
+        'Documentation':
+            'https://opentimelineio.readthedocs.io/',
+        'Issues':
+            'https://github.com/PixarAnimationStudios/OpenTimelineIO/issues',
     },
+
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Multimedia :: Video',
+        'Topic :: Multimedia :: Video :: Display',
+        'Topic :: Multimedia :: Video :: Non-Linear Editor',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'License :: Other/Proprietary License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Operating System :: OS Independent',
+        'Natural Language :: English',
+    ],
+
+    keywords='film tv editing editorial edit non-linear edl time',
+
+    platforms='any',
+
     package_data={
         'opentimelineio': [
             'adapters/builtin_adapters.plugin_manifest.json',
-            # 'lib/libopentimelineio.so',
-            # 'lib/libopentime.so',
         ],
-        # 'opentimelineio_contrib': [
-        #     'adapters/contrib_adapters.plugin_manifest.json',
-        # ]
+        'opentimelineio_contrib': [
+            'adapters/contrib_adapters.plugin_manifest.json',
+        ]
     },
-    # because we need to open() the adapters manifest, we aren't zip-safe
-    zip_safe=False,
-    tests_require=[
-            'mock;python_version<"3.3"',
+
+    include_package_data=True,
+    packages=(
+        find_packages(where="python")
+        +find_packages(where="contrib")
+    ),
+    ext_modules=[
+        CMakeExtension('_opentimelineio'),
+        CMakeExtension('_opentime'),
+    ],
+    package_dir={
+        "":"python",
+        "opentimelineio_contrib":"contrib/opentimelineio_contrib/",
+    },
+
+    install_requires=[
+        # PyAAF2 to go here eventually
     ],
     entry_points={
         'console_scripts': [
@@ -131,4 +284,32 @@ setup(
             'otiostat = opentimelineio.console.otiostat:main',
         ],
     },
+    extras_require={
+        'dev': [
+            'flake8>=3.5',
+            'coverage>=4.5',
+            'tox>=3.0',
+        ],
+        'view': [
+            'PySide2~=5.11'
+        ]
+    },
+
+    test_suite='setup.test_otio',
+
+    tests_require=[
+        'mock;python_version<"3.3"',
+    ],
+
+    # because we need to open() the adapters manifest, we aren't zip-safe
+    zip_safe=False,
+
+    # Use the code that wires the PROJECT_METADATA into the __init__ files.
+    cmdclass={
+        'build_py': AddMetadataToInits,
+        'build_ext':CMakeBuild,
+    },
+
+    # expand the project metadata dictionary to fill in those values
+    **PROJECT_METADATA
 )
