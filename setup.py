@@ -6,19 +6,18 @@
 import os
 import re
 import sys
-import sysconfig
 import platform
 import subprocess
 import unittest
 
+from setuptools import (
+    setup,
+    Extension,
+    find_packages,
+)
 
-from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
-from distutils.version import LooseVersion
-from shutil import copyfile, copymode
-
-import setuptools
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -49,10 +48,14 @@ class CMakeBuild(build_ext):
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
+        RPATH_VAR_NAME = '$ORIGIN'
+        if platform.system() == 'Darwin':
+            RPATH_VAR_NAME = '@loader_path'
+
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + os.path.join(extdir, 'opentimelineio') ,
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + os.path.join(extdir, 'opentimelineio', '') ,
             '-DPYTHON_EXECUTABLE=' + sys.executable,
-            '-DCMAKE_INSTALL_RPATH=$ORIGIN',
+            '-DCMAKE_INSTALL_RPATH=' + RPATH_VAR_NAME,
             '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
             '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF',
         ]
@@ -96,7 +99,7 @@ setup(
     long_description='',
     test_suite='setup.test_otio',
     include_package_data=True,
-    packages=setuptools.find_packages(where="python"),
+    packages=find_packages(where="python"),
     ext_modules=[
         CMakeExtension('_opentimelineio'),
         CMakeExtension('_opentime')
