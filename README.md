@@ -69,6 +69,8 @@ You can install OpenTimelineIO via
 
 For more details, including how to run the included viewer program, see: https://opentimelineio.readthedocs.io/en/latest/tutorials/quickstart.html
 
+For information on building the C++ core from source, see: https://opentimelineio.readthedocs.io/en/latest/tutorials/building-from-source.html
+
 Example Usage
 -------
 

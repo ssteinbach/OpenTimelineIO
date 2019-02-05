@@ -37,6 +37,7 @@ Tutorials
    :maxdepth: 2
 
    tutorials/adapters
+   tutorials/building-from-source
    tutorials/architecture
    tutorials/contributing
    tutorials/feature-matrix
