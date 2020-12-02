@@ -11,9 +11,13 @@ add_library(opentime SHARED
             rationalTime.cpp
             ${OPENTIME_HEADER_FILES})
 
-target_include_directories(opentime PUBLIC "${PROJECT_SOURCE_DIR}/src")
-set_target_properties(opentime PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-			MACOSX_RPATH true WINDOWS_EXPORT_ALL_SYMBOLS true)
+target_link_libraries(opentime Imath)
+
+target_include_directories(
+    opentime PUBLIC "${PROJECT_SOURCE_DIR}/src" "${Imath_DIR}/include")
+set_target_properties(
+    opentime PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    MACOSX_RPATH true WINDOWS_EXPORT_ALL_SYMBOLS true)
 install(TARGETS opentime
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib)

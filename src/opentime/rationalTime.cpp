@@ -5,8 +5,11 @@
 #include <ciso646>
 #include <cmath>
 #include <vector>
+#include <Imath/ImathBox.h>
 
 namespace opentime { namespace OPENTIME_VERSION  {
+
+const Imath::Box3f big_box;
     
 RationalTime RationalTime::_invalid_time {0, RationalTime::_invalid_rate};
 

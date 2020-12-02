@@ -6,7 +6,7 @@ if (NOT OTIO_CXX_NOINSTALL)
 endif (NOT OTIO_CXX_NOINSTALL)
 
 # detect if the submodules haven't been updated
-set(DEPS_SUBMODULES any optional-lite pybind11 rapidjson)
+set(DEPS_SUBMODULES any optional-lite pybind11 rapidjson Imath)
 foreach (submodule IN LISTS DEPS_SUBMODULES)
     file(GLOB SUBMOD_CONTENTS ${submodule})
     list(LENGTH SUBMOD_CONTENTS SUBMOD_CONTENT_LEN)
